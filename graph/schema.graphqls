@@ -5,7 +5,10 @@
 
 type Customer {
   customerId: String!
-  zipCode: String!
+  username: String!
+  email: String!,
+  age: Int!
+  metaData: String!
 }
 
 input NewCustomer {
@@ -15,6 +18,7 @@ input NewCustomer {
 
 type Query {
   getCustomer(customerId: String!): Customer!
+    getCustomerByMetaData(metaData: String!): Customer!
 }
 
 type Mutation {

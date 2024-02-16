@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"strconv"
 	"tutorials/gqlgen-users/databaseConnector"
 	"tutorials/gqlgen-users/graph/model"
 )
@@ -14,7 +15,7 @@ import (
 func (r *mutationResolver) SaveCustomer(ctx context.Context, input model.NewCustomer) (bool, error) {
 	customer := &model.Customer{
 		CustomerID: input.CustomerID,
-		ZipCode:    input.ZipCode,
+		Email:      input.ZipCode,
 	}
 	r.customer = append(r.customer, customer)
 	return true, nil
@@ -22,18 +23,57 @@ func (r *mutationResolver) SaveCustomer(ctx context.Context, input model.NewCust
 
 // GetCustomer is the resolver for the getCustomer field.
 func (r *queryResolver) GetCustomer(ctx context.Context, customerID string) (*model.Customer, error) {
-	customer, err := databaseConnector.GetUserByID(4)
+	cid, _ := strconv.Atoi(customerID)
+	var customer *databaseConnector.User
+	var err error
+	customer, err = databaseConnector.GetUserByID(uint(cid))
+
 	if err != nil {
 		// handle error
 		return nil, err
 	}
+
+	// get the underlying byte slice.
+	jsonbText, _ := customer.MetaData.Value()
+	// Convert byte slice to string
+	jsonString := string(jsonbText.([]byte))
+
+	// map returned customer structure from the DB into the model
 	c := model.Customer{
-		CustomerID: "123",
-		ZipCode:    customer.Email,
+		CustomerID: strconv.FormatUint(uint64(customer.ID), 10),
+		Username:   customer.Username,
+		Email:      customer.Email,
+		Age:        customer.Age,
+		MetaData:   jsonString,
 	}
 
 	return &c, nil
-	// return r.customer[0], nil
+}
+
+// GetCustomerByMetaData is the resolver for the getCustomerByMetaData field.
+func (r *queryResolver) GetCustomerByMetaData(ctx context.Context, metaData string) (*model.Customer, error) {
+	customer, err := databaseConnector.GetUserByMetaData(metaData)
+
+	if err != nil {
+		// handle error
+		return nil, err
+	}
+
+	// get the underlying byte slice.
+	jsonbText, _ := customer.MetaData.Value()
+	// Convert byte slice to string
+	jsonString := string(jsonbText.([]byte))
+
+	// map returned customer structure from the DB into the model
+	c := model.Customer{
+		CustomerID: strconv.FormatUint(uint64(customer.ID), 10),
+		Username:   customer.Username,
+		Email:      customer.Email,
+		Age:        customer.Age,
+		MetaData:   jsonString,
+	}
+
+	return &c, nil
 }
 
 // Mutation returns MutationResolver implementation.

@@ -4,7 +4,10 @@ package model
 
 type Customer struct {
 	CustomerID string `json:"customerId"`
-	ZipCode    string `json:"zipCode"`
+	Username   string `json:"username"`
+	Email      string `json:"email"`
+	Age        int    `json:"age"`
+	MetaData   string `json:"metaData"`
 }
 
 type Mutation struct {
