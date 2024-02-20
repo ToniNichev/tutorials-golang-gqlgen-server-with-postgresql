@@ -13,11 +13,18 @@ import (
 
 // SaveCustomer is the resolver for the saveCustomer field.
 func (r *mutationResolver) SaveCustomer(ctx context.Context, input model.NewCustomer) (bool, error) {
-	customer := &model.Customer{
-		CustomerID: input.CustomerID,
-		Email:      input.ZipCode,
+	databaseConnector.CreateUser(input.Username, input.Email, input.Age, input.MetaData)
+	return true, nil
+}
+
+// CreateDb is the resolver for the createDB field.
+func (r *mutationResolver) CreateDb(ctx context.Context, tableName string) (bool, error) {
+	err := databaseConnector.CreateDB(tableName)
+
+	if err != nil {
+		// handle error
+		return false, err
 	}
-	r.customer = append(r.customer, customer)
 	return true, nil
 }
 
