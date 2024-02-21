@@ -3,12 +3,15 @@
 # https://gqlgen.com/getting-started/
 
 
+
+
 type Customer {
   customerId: String!
   username: String!
   email: String!,
   age: Int!
   metaData: String!
+  bookmarks(group: String): bookmarksPaginated!
 }
 
 input NewCustomer {
@@ -19,6 +22,25 @@ input NewCustomer {
   metaData: String!
 }
 
+type PageInfo{
+  nextPage: String
+  previousPage: String
+}
+
+type bookmarksPaginated {
+  data:[Bookmark!]
+  pageInfo: PageInfo
+}
+
+type Bookmark {
+  bookmarkId: String!
+  userId: String!
+  name: String!
+  group: String!,
+  metaData: String!
+}
+
+
 type Query {
   getCustomer(customerId: String!): Customer!
   getCustomerByMetaData(metaData: String!): Customer!
@@ -27,4 +49,5 @@ type Query {
 type Mutation {
   saveCustomer(input: NewCustomer!):Boolean!
   createDB(tableName: String!):Boolean!
+  addBookmark(userId: String! name: String! group: String! metaData: String):Boolean!
 }

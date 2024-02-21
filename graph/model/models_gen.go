@@ -2,12 +2,21 @@
 
 package model
 
-type Customer struct {
-	CustomerID string `json:"customerId"`
-	Username   string `json:"username"`
-	Email      string `json:"email"`
-	Age        int    `json:"age"`
+type Bookmark struct {
+	BookmarkID string `json:"bookmarkId"`
+	UserID     string `json:"userId"`
+	Name       string `json:"name"`
+	Group      string `json:"group"`
 	MetaData   string `json:"metaData"`
+}
+
+type Customer struct {
+	CustomerID string              `json:"customerId"`
+	Username   string              `json:"username"`
+	Email      string              `json:"email"`
+	Age        int                 `json:"age"`
+	MetaData   string              `json:"metaData"`
+	Bookmarks  *BookmarksPaginated `json:"bookmarks"`
 }
 
 type Mutation struct {
@@ -21,5 +30,15 @@ type NewCustomer struct {
 	MetaData   string `json:"metaData"`
 }
 
+type PageInfo struct {
+	NextPage     *string `json:"nextPage,omitempty"`
+	PreviousPage *string `json:"previousPage,omitempty"`
+}
+
 type Query struct {
+}
+
+type BookmarksPaginated struct {
+	Data     []*Bookmark `json:"data,omitempty"`
+	PageInfo *PageInfo   `json:"pageInfo,omitempty"`
 }

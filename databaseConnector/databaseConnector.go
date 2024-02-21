@@ -16,24 +16,84 @@ type User struct {
 	MetaData pgtype.JSONB `gorm:"type:jsonb" json:"fieldnameofjsonb"`
 }
 
+type Bookmark struct {
+	ID       uint `gorm:"primaryKey"`
+	UserId   string
+	Name     string
+	Group    string
+	MetaData pgtype.JSONB `gorm:"type:jsonb" json:"fieldnameofjsonb"`
+}
+
 func autoMigrateDB(db *gorm.DB) {
 	// Perform database migration
-	err := db.AutoMigrate(&User{})
-	if err != nil {
-		fmt.Println(err)
-	}
+	func() {
+		err := db.AutoMigrate(&User{})
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
+
+	func() {
+		err := db.AutoMigrate(&Bookmark{})
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
 }
 
 func connectToPostgreSQL() (*gorm.DB, error) {
-	// dsn := "user=mynews password=test123 dbname=tests host=localhost port=5432 sslmode=disable"
-	dsn := "user=toninichev dbname=tests host=localhost port=5432 sslmode=disable"
+	dsn := "user=mynews password=test123 dbname=tests host=localhost port=5432 sslmode=disable"
+	// dsn := "user=toninichev dbname=tests host=localhost port=5432 sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
-
 	return db, nil
 }
+
+// Bookmarks functions
+
+func AddBookmark(user_id string, name string, group string, metaData string) (*Bookmark, error) {
+	jsonData := pgtype.JSONB{}
+	err := jsonData.Set([]byte(metaData))
+	if err != nil {
+		return nil, err
+	}
+	db, err := connectToPostgreSQL()
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a user
+	bookmark := Bookmark{UserId: user_id, Name: name, Group: group, MetaData: jsonData}
+
+	result := db.Create(&bookmark)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &bookmark, nil
+}
+
+func GetBookmarks(user_id string) (*[]Bookmark, error) {
+	db, err := connectToPostgreSQL()
+	if err != nil {
+		return nil, err
+	}
+
+	var bookmark []Bookmark
+	//result := db.Find(&bookmark)
+
+	result := db.Table("bookmarks").Where("user_id=?", user_id).Find(&bookmark)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &bookmark, nil
+}
+
+// USER functions
 
 func createuserWithMetaData(db *gorm.DB, username string, email string, age int, metaData string) (*User, error) {
 	jsonData := pgtype.JSONB{}
