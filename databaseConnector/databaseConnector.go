@@ -42,8 +42,8 @@ func autoMigrateDB(db *gorm.DB) {
 }
 
 func connectToPostgreSQL() (*gorm.DB, error) {
-	dsn := "user=mynews password=test123 dbname=tests host=localhost port=5432 sslmode=disable"
-	// dsn := "user=toninichev dbname=tests host=localhost port=5432 sslmode=disable"
+	// dsn := "user=mynews password=test123 dbname=tests host=localhost port=5432 sslmode=disable"
+	dsn := "user=toninichev dbname=tests host=localhost port=5432 sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
@@ -149,16 +149,17 @@ func GetUserByID(userID uint) (*User, error) {
 	return &user, nil
 }
 
-func GetUserByMetaData(metaDataFilter string) (*User, error) {
+func GetUserByMetaData(metaDataFilter string) (*[]User, error) {
 	db, err := connectToPostgreSQL()
 	if err != nil {
 		return nil, err
 	}
 
-	var user User
+	var user []User
 	// result := db.First(&user, userID)
 
-	result := db.Where(metaDataFilter).First(&user)
+	result := db.Where(metaDataFilter).Find(&user)
+	fmt.Println(user)
 
 	if result.Error != nil {
 		return nil, result.Error

@@ -99,29 +99,43 @@ func (r *queryResolver) GetCustomer(ctx context.Context, customerID string) (*mo
 }
 
 // GetCustomerByMetaData is the resolver for the getCustomerByMetaData field.
-func (r *queryResolver) GetCustomerByMetaData(ctx context.Context, metaData string) (*model.Customer, error) {
-	customer, err := databaseConnector.GetUserByMetaData(metaData)
+func (r *queryResolver) GetCustomerByMetaData(ctx context.Context, metaData string) ([]*model.Customer, error) {
+	customers, err := databaseConnector.GetUserByMetaData(metaData)
 
 	if err != nil {
 		// handle error
 		return nil, err
 	}
 
-	// get the underlying byte slice.
-	jsonbText, _ := customer.MetaData.Value()
-	// Convert byte slice to string
-	jsonString := string(jsonbText.([]byte))
+	var result []*model.Customer
 
-	// map returned customer structure from the DB into the model
-	c := model.Customer{
-		CustomerID: strconv.FormatUint(uint64(customer.ID), 10),
-		Username:   customer.Username,
-		Email:      customer.Email,
-		Age:        customer.Age,
-		MetaData:   jsonString,
+	for _, user := range *customers {
+
+		// get the underlying byte slice.
+		jsonbText, _ := user.MetaData.Value()
+		// Convert byte slice to string
+		jsonString := string(jsonbText.([]byte))
+
+		// map returned customer structure from the DB into the model
+		c := model.Customer{
+			CustomerID: strconv.FormatUint(uint64(user.ID), 10),
+			Username:   user.Username,
+			Email:      user.Email,
+			Age:        user.Age,
+			MetaData:   jsonString,
+		}
+		result = append(result, &c)
 	}
 
-	return &c, nil
+	return result, nil
+}
+
+func (r *Resolver) Bookmarks(ctx context.Context, metaData string) ([]*model.BookmarksPaginated, error) {
+	// var result []*model.BookmarksPaginated
+
+	//result
+
+	return nil, nil
 }
 
 // Mutation returns MutationResolver implementation.

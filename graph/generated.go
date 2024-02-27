@@ -93,7 +93,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	GetCustomer(ctx context.Context, customerID string) (*model.Customer, error)
-	GetCustomerByMetaData(ctx context.Context, metaData string) (*model.Customer, error)
+	GetCustomerByMetaData(ctx context.Context, metaData string) ([]*model.Customer, error)
 }
 
 type executableSchema struct {
@@ -1392,9 +1392,9 @@ func (ec *executionContext) _Query_getCustomerByMetaData(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Customer)
+	res := resTmp.([]*model.Customer)
 	fc.Result = res
-	return ec.marshalNCustomer2ᚖtutorialsᚋgqlgenᚑusersᚋgraphᚋmodelᚐCustomer(ctx, field.Selections, res)
+	return ec.marshalNCustomer2ᚕᚖtutorialsᚋgqlgenᚑusersᚋgraphᚋmodelᚐCustomer(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getCustomerByMetaData(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4204,6 +4204,44 @@ func (ec *executionContext) marshalNCustomer2tutorialsᚋgqlgenᚑusersᚋgraph�
 	return ec._Customer(ctx, sel, &v)
 }
 
+func (ec *executionContext) marshalNCustomer2ᚕᚖtutorialsᚋgqlgenᚑusersᚋgraphᚋmodelᚐCustomer(ctx context.Context, sel ast.SelectionSet, v []*model.Customer) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOCustomer2ᚖtutorialsᚋgqlgenᚑusersᚋgraphᚋmodelᚐCustomer(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
 func (ec *executionContext) marshalNCustomer2ᚖtutorialsᚋgqlgenᚑusersᚋgraphᚋmodelᚐCustomer(ctx context.Context, sel ast.SelectionSet, v *model.Customer) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -4583,6 +4621,13 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOCustomer2ᚖtutorialsᚋgqlgenᚑusersᚋgraphᚋmodelᚐCustomer(ctx context.Context, sel ast.SelectionSet, v *model.Customer) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Customer(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOPageInfo2ᚖtutorialsᚋgqlgenᚑusersᚋgraphᚋmodelᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *model.PageInfo) graphql.Marshaler {
