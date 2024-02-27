@@ -66,7 +66,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		AddBookmark  func(childComplexity int, userID string, name string, group string, metaData *string) int
-		CreateDb     func(childComplexity int, tableName string) int
+		CreateDb     func(childComplexity int) int
 		SaveCustomer func(childComplexity int, input model.NewCustomer) int
 	}
 
@@ -88,7 +88,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	SaveCustomer(ctx context.Context, input model.NewCustomer) (bool, error)
-	CreateDb(ctx context.Context, tableName string) (bool, error)
+	CreateDb(ctx context.Context) (bool, error)
 	AddBookmark(ctx context.Context, userID string, name string, group string, metaData *string) (bool, error)
 }
 type QueryResolver interface {
@@ -214,12 +214,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_createDB_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateDb(childComplexity, args["tableName"].(string)), true
+		return e.complexity.Mutation.CreateDb(childComplexity), true
 
 	case "Mutation.saveCustomer":
 		if e.complexity.Mutation.SaveCustomer == nil {
@@ -464,21 +459,6 @@ func (ec *executionContext) field_Mutation_addBookmark_args(ctx context.Context,
 		}
 	}
 	args["metaData"] = arg3
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_createDB_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["tableName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tableName"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["tableName"] = arg0
 	return args, nil
 }
 
@@ -1150,7 +1130,7 @@ func (ec *executionContext) _Mutation_createDB(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateDb(rctx, fc.Args["tableName"].(string))
+		return ec.resolvers.Mutation().CreateDb(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1176,17 +1156,6 @@ func (ec *executionContext) fieldContext_Mutation_createDB(ctx context.Context, 
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createDB_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -3475,20 +3444,13 @@ func (ec *executionContext) unmarshalInputNewCustomer(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"customerId", "username", "email", "age", "metaData"}
+	fieldsInOrder := [...]string{"username", "email", "age", "metaData"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "customerId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerId"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.CustomerID = data
 		case "username":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
 			data, err := ec.unmarshalNString2string(ctx, v)

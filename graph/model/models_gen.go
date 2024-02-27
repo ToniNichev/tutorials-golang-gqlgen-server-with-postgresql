@@ -23,11 +23,10 @@ type Mutation struct {
 }
 
 type NewCustomer struct {
-	CustomerID string `json:"customerId"`
-	Username   string `json:"username"`
-	Email      string `json:"email"`
-	Age        int    `json:"age"`
-	MetaData   string `json:"metaData"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Age      int    `json:"age"`
+	MetaData string `json:"metaData"`
 }
 
 type PageInfo struct {

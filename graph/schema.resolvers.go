@@ -18,8 +18,8 @@ func (r *mutationResolver) SaveCustomer(ctx context.Context, input model.NewCust
 }
 
 // CreateDb is the resolver for the createDB field.
-func (r *mutationResolver) CreateDb(ctx context.Context, tableName string) (bool, error) {
-	err := databaseConnector.CreateDB(tableName)
+func (r *mutationResolver) CreateDb(ctx context.Context) (bool, error) {
+	err := databaseConnector.CreateDB()
 
 	if err != nil {
 		// handle error

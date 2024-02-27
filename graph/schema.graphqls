@@ -15,7 +15,6 @@ type Customer {
 }
 
 input NewCustomer {
-  customerId: String!
   username: String!
   email: String!,
   age: Int!
@@ -48,6 +47,6 @@ type Query {
 
 type Mutation {
   saveCustomer(input: NewCustomer!):Boolean!
-  createDB(tableName: String!):Boolean!
+  createDB:Boolean!
   addBookmark(userId: String! name: String! group: String! metaData: String):Boolean!
 }

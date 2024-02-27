@@ -117,7 +117,7 @@ func createUser(db *gorm.DB, user *User) error {
 	return nil
 }
 
-func CreateDB(tableName string) error {
+func CreateDB() error {
 	db, err := connectToPostgreSQL()
 	if err != nil {
 		return err
